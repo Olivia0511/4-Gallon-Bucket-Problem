@@ -1,0 +1,77 @@
+class WaterJugSolver:
+    def __init__(self, goal, jug1_capacity, jug2_capacity):
+        self.goal = goal
+        self.jug1_capacity = jug1_capacity
+        self.jug2_capacity = jug2_capacity
+        self.visited_states = set()
+
+    def solve(self):
+        steps = []
+        if self.dfs(0, 0, steps):
+            return steps
+        else:
+            return "No solution found."
+
+    def dfs(self, jug1, jug2, steps):
+        if (jug1, jug2) in self.visited_states:
+            return False
+
+        self.visited_states.add((jug1, jug2))
+
+        if jug2 == self.goal:
+            return True
+
+        # Fill the 3-gallon bucket
+        if jug1 < self.jug1_capacity:
+            steps.append(f"Fill the {self.jug1_capacity}-gallon bucket: ({self.jug1_capacity},{jug2})")
+            if self.dfs(self.jug1_capacity, jug2, steps):
+                return True
+            steps.pop()
+
+        # Fill the 5-gallon bucket
+        if jug2 < self.jug2_capacity:
+            steps.append(f"Fill the {self.jug2_capacity}-gallon bucket: ({jug1},{self.jug2_capacity})")
+            if self.dfs(jug1, self.jug2_capacity, steps):
+                return True
+            steps.pop()
+
+        # Pour water from 3-gallon bucket to 5-gallon bucket
+        transfer = min(jug1, self.jug2_capacity - jug2)
+        if transfer > 0:
+            steps.append(f"Pour from {self.jug1_capacity}-gallon to {self.jug2_capacity}-gallon: ({jug1 - transfer},{jug2 + transfer})")
+            if self.dfs(jug1 - transfer, jug2 + transfer, steps):
+                return True
+            steps.pop()
+
+        # Pour water from 5-gallon bucket to 3-gallon bucket
+        transfer = min(jug2, self.jug1_capacity - jug1)
+        if transfer > 0:
+            steps.append(f"Pour from {self.jug2_capacity}-gallon to {self.jug1_capacity}-gallon: ({jug1 + transfer},{jug2 - transfer})")
+            if self.dfs(jug1 + transfer, jug2 - transfer, steps):
+                return True
+            steps.pop()
+
+        # Empty the 3-gallon bucket
+        if jug1 > 0:
+            steps.append(f"Empty the {self.jug1_capacity}-gallon bucket: (0,{jug2})")
+            if self.dfs(0, jug2, steps):
+                return True
+            steps.pop()
+
+        # Empty the 5-gallon bucket
+        if jug2 > 0:
+            steps.append(f"Empty the {self.jug2_capacity}-gallon bucket: ({jug1},0)")
+            if self.dfs(jug1, 0, steps):
+                return True
+            steps.pop()
+
+        return False
+
+
+# Define the capacities and the goal
+solver = WaterJugSolver(goal=4, jug1_capacity=3, jug2_capacity=5)
+steps = solver.solve()
+
+# Print out the steps
+for index, step in enumerate(steps, 1):
+    print(f"{index}. {step}")
