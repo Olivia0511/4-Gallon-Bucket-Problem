@@ -1,3 +1,9 @@
+# 4-Gallon-Bucket-Problem
+# 2024/
+
+
+
+
 class WaterJugSolver:
     def __init__(self, goal, jug1_capacity, jug2_capacity):
         self.goal = goal
